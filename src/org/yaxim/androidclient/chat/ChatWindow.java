@@ -1,6 +1,7 @@
 package org.yaxim.androidclient.chat;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.yaxim.androidclient.MainWindow;
@@ -47,6 +48,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,7 +100,7 @@ public class ChatWindow extends SherlockListActivity implements OnKeyListener,
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
-
+		getListView().setDivider(null);
 		registerForContextMenu(getListView());
 		setContactFromUri();
 		registerXMPPService();
@@ -358,9 +360,33 @@ public class ChatWindow extends SherlockListActivity implements OnKeyListener,
 	}
 
 	private String getDateString(long milliSeconds) {
-		SimpleDateFormat dateFormater = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+		SimpleDateFormat dateFormater = new SimpleDateFormat("dd/MM/yy hh:mm a");
+		SimpleDateFormat onlydateFormater = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat onlytimeFormater = new SimpleDateFormat("hh:mm a");
 		Date date = new Date(milliSeconds);
-		return dateFormater.format(date);
+		Date today = new Date(); 
+		
+		
+		if(onlydateFormater.format(today).equals(onlydateFormater.format(date)))
+		{
+			return "Today "+ onlytimeFormater.format(date); 
+		}
+		else
+		{
+			Calendar c = Calendar.getInstance(); 
+			c.setTime(today); 
+			c.add(Calendar.DATE, -1);
+			today = c.getTime();
+			
+			if(onlydateFormater.format(today).equals(onlydateFormater.format(date)))
+			{
+				return "Yesterday "+ onlytimeFormater.format(date); 
+			}
+			
+			
+			return dateFormater.format(date);
+		}
+		
 	}
 
 	public class ChatItemWrapper {
@@ -426,8 +452,85 @@ public class ChatWindow extends SherlockListActivity implements OnKeyListener,
 				mRowView.setBackgroundColor(0x00000000); // default is transparent
 				break;
 			}
-			getMessageView().setText(message);
-			getMessageView().setTextSize(TypedValue.COMPLEX_UNIT_SP, chatWindow.mChatFontSize);
+			
+			if (from_me) {
+				
+				RelativeLayout.LayoutParams MessageParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				MessageParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+				getMessageView().setLayoutParams(MessageParams);
+				
+				
+				RelativeLayout.LayoutParams DateParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				DateParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+				DateParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, getMessageView().getId());
+				getDateView().setLayoutParams(DateParams);
+				
+				RelativeLayout.LayoutParams FromParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				FromParams.addRule(RelativeLayout.ALIGN_RIGHT, getDateView().getId());
+				FromParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, getMessageView().getId());
+				FromParams.addRule(RelativeLayout.ALIGN_BASELINE, getDateView().getId());
+				getFromView().setLayoutParams(FromParams);
+				
+				
+				RelativeLayout.LayoutParams IconParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				IconParams.addRule(RelativeLayout.ALIGN_RIGHT, getDateView().getId());
+				IconParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, getMessageView().getId());
+				getIconView().setLayoutParams(IconParams);
+				
+				
+				
+				getMessageView().setVisibility(View.VISIBLE);
+				getMessageView().setBackgroundResource(R.drawable.right_message_bg);
+				getMessageView().setText(message);
+				getMessageView().setTextSize(TypedValue.COMPLEX_UNIT_SP, chatWindow.mChatFontSize);
+				
+			}
+			else
+			{
+				
+				RelativeLayout.LayoutParams MessageParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				MessageParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+				getMessageView().setLayoutParams(MessageParams);
+				
+				
+				RelativeLayout.LayoutParams DateParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				DateParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+				DateParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, getMessageView().getId());
+				getDateView().setLayoutParams(DateParams);
+				
+				RelativeLayout.LayoutParams FromParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				FromParams.addRule(RelativeLayout.ALIGN_LEFT, getDateView().getId());
+				FromParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, getMessageView().getId());
+				FromParams.addRule(RelativeLayout.ALIGN_BASELINE, getDateView().getId());
+				getFromView().setLayoutParams(FromParams);
+				
+				
+				RelativeLayout.LayoutParams IconParams = 
+				new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+				RelativeLayout.LayoutParams.WRAP_CONTENT);
+				IconParams.addRule(RelativeLayout.ALIGN_LEFT, getDateView().getId());
+				IconParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, getMessageView().getId());
+				getIconView().setLayoutParams(IconParams);
+				
+				getMessageView().setVisibility(View.VISIBLE);
+				getMessageView().setBackgroundResource(R.drawable.left_message_bg);
+				getMessageView().setText(message);
+				getMessageView().setTextSize(TypedValue.COMPLEX_UNIT_SP, chatWindow.mChatFontSize);
+			}
 		}
 		
 		TextView getDateView() {
