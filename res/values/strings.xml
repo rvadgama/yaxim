@@ -3,6 +3,7 @@
 	<string name="app_name">yaxim</string>
 
 	<!-- Connection state -->
+	<string name="build_version">0.8.6b</string>
 	<string name="conn_title">yaxim: %s</string>
 	<string name="conn_connecting">Connecting to server…</string>
 	<string name="conn_online">Online</string>
